@@ -1,12 +1,4 @@
 <?php
-<<<<<<< HEAD
-
-abstract class user{
- private $nom;
-    private $email;    
-
-    abstract public function methode();
-=======
 abstract class User{
     protected string $name;
     protected string $email;
@@ -25,6 +17,5 @@ abstract class User{
       public function getType(){
         return $this->type;
     }
->>>>>>> ff11d37f587c5ee0c6cf77c9ad2555190fa8690e
 }
 ?>
