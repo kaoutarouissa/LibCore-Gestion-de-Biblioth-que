@@ -1,29 +1,58 @@
 <?php
 
-echo "============= MENU ============\n";
-echo "\n";
+while (true) {
+    echo "\n\n";
+    echo "Menu Principale\n\n\n";
 
-echo "1 - Bibliothécaire\n";
-echo "2 - Member\n";
+    echo "1 - Bibliothécaire\n";
+    echo "2 - Member\n";
+    echo "0 - Quitter\n";
 
-$choice = readline("Choisir votre rôle : ");
-if($choice)
-if ($choice == 1) {
+    $choix = readline("Choisir votre rôle : ");
 
-    echo "\n--- DASHBOARD BIBLIOTHÉCAIRE ---\n";
+    if ($choix == 1) {
 
-    echo "1. Ajouter un livre\n";
-    echo "2. Gérer les membres\n";
-    echo "3. Voir les livres\n";
+        while (true) {
 
-} elseif ($choice == 2) {
+            echo "\nMenu Foncionalites\n\n\n";
+            echo "1. Ajouter un livre\n";
+            echo "2. Creer un compt membre\n";
+            echo "3. Voir la liste des livres\n";
+            echo "4. Retirer un livre\n";
+            echo "0. Retour\n";
 
-    echo "\n--- DASHBOARD MEMBER ---\n";
-    echo "1. Rechercher un livre\n";
-    echo "2. Emprunter un livre\n";
-    echo "3. Retourner un livre\n";
+            $subChoice = readline("Choisir une option : ");
 
-} else {
+            if ($subChoice == 0) {
+                break; 
+            }
 
-    echo "Choix invalide \n";
+            if ($subChoice == 1) {
+                echo "Ajout livre...\n";
+            } elseif ($subChoice == 2) {
+                echo "Gestion membres...\n";
+            } elseif ($subChoice == 3) {
+                echo "Liste des livres...\n";
+            }elseif ($subChoice == 4) {
+                echo "retirer des livres...\n";
+            }
+             else {
+                echo "Choix invalide\n";
+            }
+        }
+
+    } elseif ($choix == 2) {
+
+        require_once "mainMember.php";
+
+    } elseif ($choix == 0) {
+
+        echo "Aurevoir\n";
+        break; 
+
+    } else {
+
+        echo "Choix invalid\n";
+    }
 }
+?>
