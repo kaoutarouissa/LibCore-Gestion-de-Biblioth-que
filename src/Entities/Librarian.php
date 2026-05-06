@@ -1,5 +1,6 @@
 <?php
 require_once 'User.php';
+require_once 'Book.php';
 echo "jhugugu";
 class Librarian extends User{
     public function __construct(string $name, string $email, string $type){
@@ -8,8 +9,11 @@ class Librarian extends User{
         
         }
         
-        public function Ajouter(): string {
-        return "Le bibliothécaire " . $this->getName() . " est de type : " . $this->getType();
+        public function AjouterLivre(): string {
+        return "livre ajouteé sous le nom de  " . $this->getTitre() . " est de isbn : " . $this->getISBN();
+    }
+    public function AjouterCompt():string{
+        return "compte ajouter sous le nom " . $this->get();
     }
 }
 ?>
