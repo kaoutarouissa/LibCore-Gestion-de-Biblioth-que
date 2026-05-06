@@ -8,13 +8,13 @@ abstract class User{
         $this->email = $email;
         $this->type = $type;
     }
-    public function getName(){
+    public function getName():string{
         return $this->name;
     }
-    public function getEmail(){
+    public function getEmail():string{
         return $this->email;
     }
-      public function getType(){
+      public function getType():string{
         return $this->type;
     }
 }
