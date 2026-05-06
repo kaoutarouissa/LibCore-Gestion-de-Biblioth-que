@@ -17,5 +17,12 @@ abstract class User{
       public function getType():string{
         return $this->type;
     }
+    public function setName(string $name): void {
+        $this->name = $name;
+    }
+
+    public function setEmail(string $email): void {
+        $this->email = $email;
+    }
 }
 ?>
