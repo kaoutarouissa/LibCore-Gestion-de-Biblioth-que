@@ -54,9 +54,9 @@ while (true) {
 
     elseif ($choice == 2) {
 
-        $id = readline("ID du livre : ");
+        $titre = readline("titre du livre : ");
 
-        $sql = "SELECT * FROM books WHERE id=$id";
+        $sql = "SELECT * FROM books WHERE titre=$titre";
         $result = $conn->query($sql);
 
         $book = $result->fetch_assoc();
