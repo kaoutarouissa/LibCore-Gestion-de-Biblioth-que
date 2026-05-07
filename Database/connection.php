@@ -8,12 +8,12 @@ class Database {
     private $password;
     private $dbname;
 
-    protected function connect() {
+   public function connect() {
 
         $this->servername = "localhost";
         $this->username = "root";
         $this->password = "";
-        $this->dbname = "library";
+        $this->dbname = "Library";
 
         $conn = new mysqli( $this->servername,  $this->username,    $this->password,  $this->dbname);
 

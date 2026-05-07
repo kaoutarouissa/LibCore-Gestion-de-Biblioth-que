@@ -1,15 +1,18 @@
 <?php
 
-require_once "Database/conne.php";
+require_once "Database/connection.php";
+
+$db = new Database();
+$conn = $db->connect();
 
 echo "===== ESPACE MEMBRE =====\n";
 
 $email = readline("Entrez votre email : ");
 
-$stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-$stmt->execute([$email]);
+$sql = "SELECT * FROM users WHERE email = '$email'";
+$result = $conn->query($sql);
 
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
+$user = $result->fetch_assoc();
 
 if (!$user || $user['type'] != 'member') {
 
@@ -30,27 +33,17 @@ while (true) {
 
     $choice = readline("Choix : ");
 
-    // =========================
-    // RECHERCHER
-    // =========================
     if ($choice == 1) {
 
         $search = readline("Titre ou auteur : ");
 
-        $stmt = $pdo->prepare("
-            SELECT * FROM books
-            WHERE titre LIKE ?
-            OR auteur LIKE ?
-        ");
+        $sql = "SELECT * FROM books 
+                WHERE titre LIKE '%$search%' 
+                OR auteur LIKE '%$search%'";
 
-        $stmt->execute([
-            "%$search%",
-            "%$search%"
-        ]);
+        $result = $conn->query($sql);
 
-        $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (empty($books)) {
+        if ($result->num_rows == 0) {
 
             echo "Aucun livre trouvé\n";
 
@@ -58,34 +51,23 @@ while (true) {
 
             echo "\nListe des livres :\n";
 
-            foreach ($books as $book) {
+            while ($book = $result->fetch_assoc()) {
 
-                echo "- " .
-                    $book['titre'] .
-                    " | " .
-                    $book['auteur'] .
-                    " | " .
-                    $book['etat'] .
-                    "\n";
+                echo "- " . $book['titre'] .
+                    " | " . $book['auteur'] .
+                    " | " . $book['etat'] . "\n";
             }
         }
     }
 
-    // =========================
-    // EMPRUNTER
-    // =========================
     elseif ($choice == 2) {
 
         $title = readline("Titre du livre : ");
 
-        $stmt = $pdo->prepare("
-            SELECT * FROM books
-            WHERE titre = ?
-        ");
+        $sql = "SELECT * FROM books WHERE titre = '$title'";
+        $result = $conn->query($sql);
 
-        $stmt->execute([$title]);
-
-        $book = $stmt->fetch(PDO::FETCH_ASSOC);
+        $book = $result->fetch_assoc();
 
         if (!$book) {
 
@@ -99,52 +81,22 @@ while (true) {
             continue;
         }
 
-        // changer état
-        $stmt = $pdo->prepare("
-            UPDATE books
-            SET etat = 'emprunte'
-            WHERE id = ?
-        ");
+        $conn->query("UPDATE books SET etat='emprunte' WHERE id=" . $book['id']);
 
-        $stmt->execute([$book['id']]);
-
-        // ajouter emprunt
-        $stmt = $pdo->prepare("
-            INSERT INTO emprunts (
-                date_emprunt,
-                book_id,
-                user_id
-            )
-            VALUES (
-                NOW(),
-                ?,
-                ?
-            )
-        ");
-
-        $stmt->execute([
-            $book['id'],
-            $user['id']
-        ]);
+        $conn->query("INSERT INTO emprunts (date_emprunt, book_id, user_id)
+                      VALUES (NOW(), {$book['id']}, {$user['id']})");
 
         echo "Livre emprunté avec succès\n";
     }
 
-    // =========================
-    // RETOURNER
-    // =========================
     elseif ($choice == 3) {
 
         $title = readline("Titre du livre : ");
 
-        $stmt = $pdo->prepare("
-            SELECT * FROM books
-            WHERE titre = ?
-        ");
+        $sql = "SELECT * FROM books WHERE titre = '$title'";
+        $result = $conn->query($sql);
 
-        $stmt->execute([$title]);
-
-        $book = $stmt->fetch(PDO::FETCH_ASSOC);
+        $book = $result->fetch_assoc();
 
         if (!$book) {
 
@@ -152,55 +104,28 @@ while (true) {
             continue;
         }
 
-        // rendre disponible
-        $stmt = $pdo->prepare("
-            UPDATE books
-            SET etat = 'disponible'
-            WHERE id = ?
-        ");
+        $conn->query("UPDATE books SET etat='disponible' WHERE id=" . $book['id']);
 
-        $stmt->execute([$book['id']]);
-
-        // date retour
-        $stmt = $pdo->prepare("
-            UPDATE emprunts
-            SET date_retourn_livre = NOW()
-            WHERE user_id = ?
-            AND book_id = ?
-            AND date_retourn_livre IS NULL
-        ");
-
-        $stmt->execute([
-            $user['id'],
-            $book['id']
-        ]);
+        $conn->query("UPDATE emprunts 
+                      SET date_retourn_livre = NOW()
+                      WHERE user_id={$user['id']} 
+                      AND book_id={$book['id']} 
+                      AND date_retourn_livre IS NULL");
 
         echo "Livre retourné avec succès\n";
     }
 
-    // =========================
-    // MES LIVRES
-    // =========================
     elseif ($choice == 4) {
 
-        $stmt = $pdo->prepare("
-            SELECT books.titre,
-                   books.auteur,
-                   emprunts.date_emprunt
-            FROM emprunts
+        $sql = "SELECT books.titre, books.auteur, emprunts.date_emprunt
+                FROM emprunts
+                JOIN books ON emprunts.book_id = books.id
+                WHERE emprunts.user_id = {$user['id']}
+                AND emprunts.date_retourn_livre IS NULL";
 
-            JOIN books
-            ON emprunts.book_id = books.id
+        $result = $conn->query($sql);
 
-            WHERE emprunts.user_id = ?
-            AND emprunts.date_retourn_livre IS NULL
-        ");
-
-        $stmt->execute([$user['id']]);
-
-        $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (empty($books)) {
+        if ($result->num_rows == 0) {
 
             echo "Aucun livre emprunté\n";
 
@@ -208,22 +133,15 @@ while (true) {
 
             echo "\nMes livres :\n";
 
-            foreach ($books as $book) {
+            while ($book = $result->fetch_assoc()) {
 
-                echo "- " .
-                    $book['titre'] .
-                    " | " .
-                    $book['auteur'] .
-                    " | Date : " .
-                    $book['date_emprunt'] .
-                    "\n";
+                echo "- " . $book['titre'] .
+                    " | " . $book['auteur'] .
+                    " | " . $book['date_emprunt'] . "\n";
             }
         }
     }
 
-    // =========================
-    // QUITTER
-    // =========================
     elseif ($choice == 0) {
 
         echo "Au revoir\n";
