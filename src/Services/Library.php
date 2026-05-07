@@ -20,7 +20,7 @@ class Library extends Database{
     public function addCompte($nom, $email,$type) {
         // Logique pour ajouter un membre
                 $db = $this->connect();
-        $sql = "INSERT INTO users (name, email, type) VALUES ('$name', '$email', '$type')";
+        $sql = "INSERT INTO users (name, email, type) VALUES ('$nom', '$email', '$type')";
         if ($db->query($sql) === TRUE) {
         return "Le compte de $nom a été créé avec succès.";
     } else {
