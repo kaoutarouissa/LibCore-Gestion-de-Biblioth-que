@@ -1,7 +1,7 @@
 <?php
 require_once 'User.php';
 require_once 'Book.php';
-// require_once '../Services/Library.php';
+
 class Librarian extends User{
     protected $library;
     public function __construct(string $name, string $email, string $type, $library){
@@ -16,8 +16,7 @@ class Librarian extends User{
     }
     public function AjouterCompt($nom,$email):string{
     return "compt ajouté  : ".$this->library->addCompt($nom,$email) ;
-    }
-    public function afficherLivre($titre):string{
+        public function afficherLivre($titre):string{
         return "livre affiché sous le nom : ".$this->getLivre($titre) ;
 
     }

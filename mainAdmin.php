@@ -42,7 +42,8 @@ while (true) {
                 echo "crere compt  membres...\n";
                 $nom = readline("Nom du membre : ");
     $email = readline("Email : ");
-    echo $admin->AjouterCompte($nom, $email) . "\n";
+    $type = readline("type : ");
+   echo $library->addCompte($nom, $email, $type);
 
             } elseif ($subChoice == 3) {
                 echo "Liste des livres...\n";
