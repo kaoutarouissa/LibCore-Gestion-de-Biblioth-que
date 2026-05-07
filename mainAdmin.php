@@ -42,11 +42,12 @@ while (true) {
                 echo "crere compt  membres...\n";
                 $nom = readline("Nom du membre : ");
     $email = readline("Email : ");
-    echo $admin->AjouterCompte($nom, $email) . "\n";
+    echo $admin->addCompte($nom, $email) . "\n";
 
             } elseif ($subChoice == 3) {
                 echo "Liste des livres...\n";
-                echo $admin->afficherLivre("tous") . "\n";
+                
+                echo $admin->getLivre() . "\n";
 
             }elseif ($subChoice == 4) {
                 echo "retirer des livres...\n";

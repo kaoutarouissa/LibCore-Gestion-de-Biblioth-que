@@ -17,12 +17,16 @@ class Librarian extends User{
     public function AjouterCompt($nom,$email):string{
     return "compt ajouté  : ".$this->library->addCompt($nom,$email) ;
     }
+    public function getLivre(){
+        return $this->library->getLivre();
+    }
+    
     public function afficherLivre($titre):string{
-        return "livre affiché sous le nom : ".$this->getLivre($titre) ;
+        return "livre affiché sous le nom : ".$this->getLivre() ;
 
     }
     public function RetirerLivre($titre):string{
-return "livre retiré  : ".$this->library->removeLivre($titre) ;
+return "livre retiré  : ".$this->library->RetirerLivre($titre) ;
     }
 }
 ?>
