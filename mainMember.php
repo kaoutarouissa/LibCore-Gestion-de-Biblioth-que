@@ -5,142 +5,119 @@ require_once "Database/connection.php";
 $db = new Database();
 $conn = $db->connect();
 
-echo "===== ESPACE MEMBRE =====\n";
+echo "===== ESPACE MEMBRE =====\n\n";
 
-$email = readline("Entrez votre email : ");
 
-$sql = "SELECT * FROM users WHERE email = '$email'";
+$email = readline("Entrer votre email : ");
+
+$sql = "SELECT * FROM users WHERE email='$email'";
 $result = $conn->query($sql);
 
 $user = $result->fetch_assoc();
 
-if (!$user || $user['type'] != 'member') {
+if (!$user) {
 
-    echo "Membre non trouvé\n";
+    echo "Utilisateur introuvable\n";
     exit;
 }
 
-echo "Bienvenue " . $user['name'] . "\n";
+echo "\nBienvenue " . $user['name'] . "\n";
+
 
 while (true) {
 
-    echo "\n========= MENU =========\n";
-    echo "1 - Rechercher un livre\n";
+    echo "\n===== MENU =====\n";
+
+    echo "1 - Voir les livres\n";
     echo "2 - Emprunter un livre\n";
     echo "3 - Retourner un livre\n";
-    echo "4 - Mes livres\n";
     echo "0 - Quitter\n";
 
     $choice = readline("Choix : ");
 
     if ($choice == 1) {
 
-        $search = readline("Titre ou auteur : ");
-
-        $sql = "SELECT * FROM books 
-                WHERE titre LIKE '%$search%' 
-                OR auteur LIKE '%$search%'";
-
+        $sql = "SELECT * FROM books";
         $result = $conn->query($sql);
 
-        if ($result->num_rows == 0) {
+        echo "\n===== LISTE DES LIVRES =====\n";
 
-            echo "Aucun livre trouvé\n";
+        while ($book = $result->fetch_assoc()) {
 
-        } else {
-
-            echo "\nListe des livres :\n";
-
-            while ($book = $result->fetch_assoc()) {
-
-                echo "- " . $book['titre'] .
-                    " | " . $book['auteur'] .
-                    " | " . $book['etat'] . "\n";
-            }
+            echo $book['id'] . " - ";
+            echo $book['titre'] . " | ";
+            echo $book['auteur'] . " | ";
+            echo $book['etat'] . "\n";
         }
     }
+
 
     elseif ($choice == 2) {
 
-        $title = readline("Titre du livre : ");
+        $id = readline("ID du livre : ");
 
-        $sql = "SELECT * FROM books WHERE titre = '$title'";
+        $sql = "SELECT * FROM books WHERE id=$id";
         $result = $conn->query($sql);
 
         $book = $result->fetch_assoc();
 
         if (!$book) {
 
-            echo "Livre introuvable\n";
-            continue;
+            echo "Livre non trouvé\n";
         }
 
-        if ($book['etat'] != 'disponible') {
+        elseif ($book['etat'] != "disponible") {
 
             echo "Livre non disponible\n";
-            continue;
         }
 
-        $conn->query("UPDATE books SET etat='emprunte' WHERE id=" . $book['id']);
+        else {
 
-        $conn->query("INSERT INTO emprunts (date_emprunt, book_id, user_id)
-                      VALUES (NOW(), {$book['id']}, {$user['id']})");
 
-        echo "Livre emprunté avec succès\n";
+            $sql = "UPDATE books
+                    SET etat='emprunte'
+                    WHERE id=$id";
+
+            $conn->query($sql);
+
+
+            $sql = "INSERT INTO emprunts(user_id, book_id, date_emprunt)
+                    VALUES(
+                        {$user['id']},
+                        $id,
+                        NOW()
+                    )";
+
+            $conn->query($sql);
+
+            echo "Livre emprunté avec succès\n";
+        }
     }
+
 
     elseif ($choice == 3) {
 
-        $title = readline("Titre du livre : ");
+        $id = readline("ID du livre : ");
 
-        $sql = "SELECT * FROM books WHERE titre = '$title'";
-        $result = $conn->query($sql);
 
-        $book = $result->fetch_assoc();
+        $sql = "UPDATE books
+                SET etat='disponible'
+                WHERE id=$id";
 
-        if (!$book) {
+        $conn->query($sql);
 
-            echo "Livre introuvable\n";
-            continue;
-        }
 
-        $conn->query("UPDATE books SET etat='disponible' WHERE id=" . $book['id']);
+        $sql = "UPDATE emprunts
+                SET date_retourn_livre = NOW()
+                WHERE book_id=$id
+                AND user_id={$user['id']}
+                AND date_retourn_livre IS NULL";
 
-        $conn->query("UPDATE emprunts 
-                      SET date_retourn_livre = NOW()
-                      WHERE user_id={$user['id']} 
-                      AND book_id={$book['id']} 
-                      AND date_retourn_livre IS NULL");
+        $conn->query($sql);
 
-        echo "Livre retourné avec succès\n";
+        echo "Livre retourné\n";
     }
 
-    elseif ($choice == 4) {
-
-        $sql = "SELECT books.titre, books.auteur, emprunts.date_emprunt
-                FROM emprunts
-                JOIN books ON emprunts.book_id = books.id
-                WHERE emprunts.user_id = {$user['id']}
-                AND emprunts.date_retourn_livre IS NULL";
-
-        $result = $conn->query($sql);
-
-        if ($result->num_rows == 0) {
-
-            echo "Aucun livre emprunté\n";
-
-        } else {
-
-            echo "\nMes livres :\n";
-
-            while ($book = $result->fetch_assoc()) {
-
-                echo "- " . $book['titre'] .
-                    " | " . $book['auteur'] .
-                    " | " . $book['date_emprunt'] . "\n";
-            }
-        }
-    }
 
     elseif ($choice == 0) {
 
@@ -153,3 +130,4 @@ while (true) {
         echo "Choix invalide\n";
     }
 }
+?>
