@@ -27,18 +27,29 @@ class Library extends Database{
         return "Erreur lors de la création du compte : " . $db->error;
     }
     }
-    public function getLivre($titre){
-                $db = $this->connect();
-        $sql = "SELECT * FROM books WHERE titre = '$titre'";
-        $result = $db->query($sql);
+  public function getLivre(){
 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        return "Livre trouvé : " . $row['title'] . " par " . $row['author'] . " (ISBN: " . $row['isbn'] . ")";
+    $db = $this->connect();
+
+    $sql = "SELECT * FROM books";
+
+    $result = $db->query($sql);
+
+    if($result->num_rows > 0){
+
+        while($row = $result->fetch_assoc()){
+echo "liste des livres : \n\n";
+            echo "Titre : " . $row['titre'] . "<br>";
+            echo "Auteur : " . $row['auteur'] . "<br>";
+            echo "ISBN : " . $row['ISBN'] . "<br><br>";
+        }
+
     } else {
-        return "Aucun livre trouvé avec le titre : " . $titre;
+
+        echo "Aucun livre trouvé";
     }
-    }
+}
+
     public function RetirerLivre($titre){
         $db = $this->connect();
     

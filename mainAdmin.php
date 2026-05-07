@@ -45,9 +45,11 @@ while (true) {
     $type = readline("type : ");
    echo $library->addCompte($nom, $email, $type);
 
+
             } elseif ($subChoice == 3) {
                 echo "Liste des livres...\n";
-                echo $admin->afficherLivre("tous") . "\n";
+                
+                echo $admin->getLivre() . "\n";
 
             }elseif ($subChoice == 4) {
                 echo "retirer des livres...\n";
