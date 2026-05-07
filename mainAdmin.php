@@ -1,5 +1,10 @@
 <?php
-
+require_once 'Database/connection.php';
+require_once 'src/Services/Library.php';
+require_once 'src/Entities/User.php';      // Toujours inclure le parent avant l'enfant
+require_once 'src/Entities/Librarian.php';
+$library = new Library();
+$admin = new Librarian("Admin", "admin@bibli.com", "Librarian", $library);
 while (true) {
     echo "\n\n";
     echo "Menu Principale\n\n\n";
@@ -29,12 +34,25 @@ while (true) {
 
             if ($subChoice == 1) {
                 echo "Ajout livre...\n";
+                $titre = readline("Titre du livre : ");
+    $auteur = readline("Auteur : ");
+    $isbn = readline("ISBN : ");
+    echo $admin->AjouterLivre($titre, $auteur, $isbn) . "\n";
             } elseif ($subChoice == 2) {
-                echo "Gestion membres...\n";
+                echo "crere compt  membres...\n";
+                $nom = readline("Nom du membre : ");
+    $email = readline("Email : ");
+    echo $admin->AjouterCompte($nom, $email) . "\n";
+
             } elseif ($subChoice == 3) {
                 echo "Liste des livres...\n";
+                echo $admin->afficherLivre("tous") . "\n";
+
             }elseif ($subChoice == 4) {
                 echo "retirer des livres...\n";
+                $titre = readline("Titre du livre à supprimer : ");
+    
+    echo $admin->RetirerLivre($titre) . "\n";
             }
              else {
                 echo "Choix invalide\n";
