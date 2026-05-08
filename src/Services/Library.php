@@ -8,6 +8,15 @@ class Library extends Database{
 
     public function addLivre($titre, $auteur, $ISBN) {
         $db = $this->connect();
+         $check = "SELECT * FROM books WHERE titre = '$titre'";
+
+    $result = $db->query($check);
+
+    if($result->num_rows > 0){
+
+        return "Le livre existe déjà";
+
+    }
         $sql = "INSERT INTO books (titre, auteur, ISBN) VALUES ('$titre', '$auteur', '$ISBN')";
     // Logique pour ajouter le livre dans un tableau ou une BDD
         if ($db->query($sql) === TRUE) {
@@ -36,11 +45,11 @@ class Library extends Database{
 
     if($result->num_rows > 0){
 
+       
         while($row = $result->fetch_assoc()){
-echo "liste des livres : \n\n";
-            echo "Titre : " . $row['titre'] . "<br>";
-            echo "Auteur : " . $row['auteur'] . "<br>";
-            echo "ISBN : " . $row['ISBN'] . "<br><br>";
+            echo "Titre : " . $row['titre'] . "\n";
+            echo "Auteur : " . $row['auteur'] . "\n";;
+            echo "ISBN : " . $row['ISBN'] . "\n\n";
         }
 
     } else {
@@ -49,18 +58,41 @@ echo "liste des livres : \n\n";
     }
 }
 
-    public function RetirerLivre($titre){
-        $db = $this->connect();
+  public function RetirerLivre($titre){
+
+    $db = $this->connect();
+
     
-    // On supprime la ligne qui correspond au titre
-    $sql = "DELETE FROM books WHERE titre = '$titre'";
+    $sql = "SELECT id FROM books WHERE titre='$titre'";
+
+    $result = $db->query($sql);
+
+    if($result->num_rows == 0){
+
+        return "Livre introuvable";
+    }
+
+    $row = $result->fetch_assoc();
+
+    $book_id = $row['id'];
+
+   $sql="DELETE FROM emprunts WHERE book_id='$book_id'";
+
+
+    $db->query($sql);
+
     
-    if ($db->query($sql) === TRUE) {
-        return "Le livre '$titre' a été retiré de la bibliothèque.";
+    $dlt = "DELETE FROM books WHERE id='$book_id'";
+
+    if($db->query($dlt) === TRUE){
+
+        return "Livre supprimé avec succès";
+
     } else {
-        return "Erreur lors de la suppression : " . $db->error;
+
+        return "Erreur : " . $db->error;
     }
-    }
+}
 }
 
 

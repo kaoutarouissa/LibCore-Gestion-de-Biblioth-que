@@ -37,6 +37,7 @@ while (true) {
                 $titre = readline("Titre du livre : ");
     $auteur = readline("Auteur : ");
     $isbn = readline("ISBN : ");
+    
     echo $admin->AjouterLivre($titre, $auteur, $isbn) . "\n";
             } 
             elseif ($subChoice == 2) {
