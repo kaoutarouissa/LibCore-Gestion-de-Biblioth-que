@@ -54,9 +54,9 @@ while (true) {
 
     elseif ($choice == 2) {
 
-        $id = readline("ID du livre : ");
+        $titre = readline("titre du livre : ");
 
-        $sql = "SELECT * FROM books WHERE id=$id";
+        $sql = "SELECT * FROM books WHERE titre='$titre'";
         $result = $conn->query($sql);
 
         $book = $result->fetch_assoc();
@@ -76,17 +76,17 @@ while (true) {
 
             $sql = "UPDATE books
                     SET etat='emprunte'
-                    WHERE id=$id";
+                    WHERE titre='$titre'";
 
             $conn->query($sql);
 
 
-            $sql = "INSERT INTO emprunts(user_id, book_id, date_emprunt)
-                    VALUES(
-                        {$user['id']},
-                        $id,
-                        NOW()
-                    )";
+           $sql = "INSERT INTO emprunts(user_id, book_id, date_emprunt)
+        VALUES(
+            {$user['id']},
+            {$book['id']},
+            NOW()
+        )";
 
             $conn->query($sql);
 
@@ -97,26 +97,36 @@ while (true) {
 
     elseif ($choice == 3) {
 
-        $id = readline("ID du livre : ");
+      $titre = readline("Titre du livre : ");
 
+$sql = "SELECT * FROM books WHERE titre='$titre'";
+$result = $conn->query($sql);
 
-        $sql = "UPDATE books
-                SET etat='disponible'
-                WHERE id=$id";
+$book = $result->fetch_assoc();
 
-        $conn->query($sql);
+if (!$book) {
 
+    echo "Livre introuvable\n";
+}
 
-        $sql = "UPDATE emprunts
-                SET date_retourn_livre = NOW()
-                WHERE book_id=$id
-                AND user_id={$user['id']}
-                AND date_retourn_livre IS NULL";
+else {
 
-        $conn->query($sql);
+    $sql = "UPDATE books
+            SET etat='disponible'
+            WHERE titre='$titre'";
 
-        echo "Livre retourné\n";
-    }
+    $conn->query($sql);
+
+    $sql = "UPDATE emprunts
+            SET date_retourn_livre = NOW()
+            WHERE book_id={$book['id']}
+            AND user_id={$user['id']}
+            AND date_retourn_livre IS NULL";
+
+    $conn->query($sql);
+
+    echo "Livre retourné avec succès\n";
+}}
 
 
     elseif ($choice == 0) {

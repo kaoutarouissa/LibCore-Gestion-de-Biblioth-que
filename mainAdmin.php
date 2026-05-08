@@ -1,7 +1,7 @@
 <?php
 require_once 'Database/connection.php';
 require_once 'src/Services/Library.php';
-require_once 'src/Entities/User.php';      // Toujours inclure le parent avant l'enfant
+require_once 'src/Entities/User.php';      
 require_once 'src/Entities/Librarian.php';
 $library = new Library();
 $admin = new Librarian("Admin", "admin@bibli.com", "Librarian", $library);
@@ -38,12 +38,29 @@ while (true) {
     $auteur = readline("Auteur : ");
     $isbn = readline("ISBN : ");
     echo $admin->AjouterLivre($titre, $auteur, $isbn) . "\n";
-            } elseif ($subChoice == 2) {
+            } 
+            elseif ($subChoice == 2) {
                 echo "crere compt  membres...\n";
                 $nom = readline("Nom du membre : ");
                 $email = readline("Email : ");
+            
 
-                echo $admin->AjouterCompt($nom, $email) . "\n";
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+    echo "Format email invalide\n";
+}
+else {
+
+    echo "Email valide\n";
+    $type=readline("entrer le role  proffeseur ou bien student : ");
+    
+    if($type==="student"||$type==="proffeseur"){
+    echo $admin->AjouterCompt($nom, $email,$type) . "\n";
+    }else{
+        echo "ce $type est invalide";
+    }
+}
+    
 
             } elseif ($subChoice == 3) {
                 echo "Liste des livres...\n";
@@ -63,7 +80,7 @@ while (true) {
 
     } elseif ($choix == 2) {
 
-        require_once "mainMember.php";
+        require "mainMember.php";
 
     } elseif ($choix == 0) {
 

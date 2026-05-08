@@ -18,11 +18,11 @@ class Library extends Database{
     }
 
     public function addCompte($nom, $email,$type) {
-        // Logique pour ajouter un membre
+       
                 $db = $this->connect();
         $sql = "INSERT INTO users (name, email, type) VALUES ('$nom', '$email', '$type')";
         if ($db->query($sql) === TRUE) {
-        return "Le compte de $nom a été créé avec succès.";
+        return "Le compte de $nom  ET $type a été créé avec succès.";
     } else {
         return "Erreur lors de la création du compte : " . $db->error;
     }
@@ -32,7 +32,6 @@ class Library extends Database{
     $db = $this->connect();
 
     $sql = "SELECT * FROM books";
-
     $result = $db->query($sql);
 
     if($result->num_rows > 0){

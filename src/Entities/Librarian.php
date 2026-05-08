@@ -16,8 +16,9 @@ class Librarian extends User{
         return "livre ajouté sous le nom : ".$LivreAjouté;
     }
 
-    public function AjouterCompt($nom,$email): string {
-        return "compt ajouté  : ".$this->library->addCompte($nom, $email, 'member');
+    public function AjouterCompt($nom,$email,$type): string {
+        return "compt ajouté  : ".$this->library->addCompte($nom, $email, $type);
+    
     }
 
     public function getLivre(){
